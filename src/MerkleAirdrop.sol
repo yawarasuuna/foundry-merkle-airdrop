@@ -31,6 +31,7 @@ contract MerkleAirdrop {
     // some list of address
     // allow someone in this list to claim ERC20 tokens
 
+    error MerkleAirdrop__AlreadyClaimed();
     error MerkleAirdrop__InvalidProof();
 
     using SafeERC20 for IERC20;
@@ -38,6 +39,7 @@ contract MerkleAirdrop {
     address[] claimers;
     bytes32 private immutable i_merkleRoot;
     IERC20 private immutable i_airdropToken;
+    mapping(address claimer => bool claimed) private s_alreadyClaimed;
 
     event Claim(address account, uint256 amount);
 
@@ -49,14 +51,26 @@ contract MerkleAirdrop {
     function claim(address account, uint256 amount, bytes32[] calldata merkleProof) external {
         // when using merkle proofs, we need to hash it again to avoid collisions (second pre-image attack)
         // keccak256 is resistent to clashes, but it is a best practice to do it twice
+        if (s_alreadyClaimed[account]) {
+            revert MerkleAirdrop__AlreadyClaimed();
+        }
         bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount))));
         if (!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)) {
             revert MerkleAirdrop__InvalidProof();
         }
+        s_alreadyClaimed[account] = true;
         emit Claim(account, amount);
         i_airdropToken.safeTransfer(account, amount);
     }
 
     // if we were to use for loop, it'd be gas intensive, so we use merkle proofs instead
     // merkle proof allow us to prove some piece of data that we want is in that group of data
+
+    function getMerkleRoot() external view returns (bytes32) {
+        return i_merkleRoot;
+    }
+
+    function getAirdropToken() external view returns (IERC20) {
+        return i_airdropToken;
+    }
 }
