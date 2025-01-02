@@ -11,6 +11,7 @@ contract MerkleAirdropTest is Test, ZkSyncChainChecker {
     HoneyToken public honeyToken;
     MerkleAirdrop public merkleAirdrop;
 
+    address public GAS_PAYER;
     address USER;
     uint256 userPrivKey;
     uint256 public constant AMOUNT_TO_AIRDROP = 25 * 1e18;
@@ -31,13 +32,17 @@ contract MerkleAirdropTest is Test, ZkSyncChainChecker {
             honeyToken.transfer(address(merkleAirdrop), AMOUNT_INITAL_MINT);
         }
         (USER, userPrivKey) = makeAddrAndKey("user");
+        GAS_PAYER = makeAddr("gasPayer");
     }
 
     function testUsersCanClaim() public {
         uint256 startingBalance = honeyToken.balanceOf(USER);
+        bytes32 digest = merkleAirdrop.getMessageHash(USER, AMOUNT_TO_AIRDROP);
 
-        vm.prank(USER);
-        merkleAirdrop.claim(USER, AMOUNT_TO_AIRDROP, proof);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(userPrivKey, digest); // signing doest need to prank USER to call it
+
+        vm.prank(GAS_PAYER);
+        merkleAirdrop.claim(USER, AMOUNT_TO_AIRDROP, proof, v, r, s);
 
         uint256 endingBalance = honeyToken.balanceOf(USER);
 
