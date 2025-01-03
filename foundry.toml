@@ -5,8 +5,9 @@ libs = ["lib"]
 
 remapping = [
     '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts',
+    'murky/=lib/murky/',
     'forge-std=lib/forge-std/src/',
-    'murky/=lib/murky/'
+    'foundry-devops/=lib/foundry-devops/'
 ]
 
 fs_permissions = [

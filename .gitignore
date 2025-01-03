@@ -19,4 +19,7 @@ lib/
 
 # Coverage
 coverage.txt
+signature.txt
+
+# ZKStuff
 zkout/
