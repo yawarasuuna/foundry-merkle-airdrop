@@ -22,7 +22,7 @@ import {ScriptHelper} from "murky/script/common/ScriptHelper.sol";
  * @notice https://github.com/dmfxyz/murky
  */
 contract MakeMerkle is Script, ScriptHelper {
-    using stdJson for string; // enables us to use the json cheatcodes for strings
+    using stdJson for string;
 
     Merkle private m = new Merkle(); // instance of the merkle contract from Murky to do shit
 
@@ -108,13 +108,13 @@ contract MakeMerkle is Script, ScriptHelper {
         }
 
         for (uint256 i = 0; i < count; ++i) {
-            // get proof gets the nodes needed for the proof & strigify (from helper lib)
+            // get proof gets the nodes needed for the proof & stringify (from helper lib)
             string memory proof = bytes32ArrayToString(m.getProof(leafs, i));
             // get the root hash and stringify
             string memory root = vm.toString(m.getRoot(leafs));
             // get the specific leaf working on
             string memory leaf = vm.toString(leafs[i]);
-            // get the singified input (address, amount)
+            // get the stringified input (address, amount)
             string memory input = inputs[i];
 
             // generate the Json output file (tree dump)
