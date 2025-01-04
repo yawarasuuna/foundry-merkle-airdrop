@@ -39,7 +39,7 @@ contract MerkleAirdropTest is Test, ZkSyncChainChecker {
         uint256 startingBalance = honeyToken.balanceOf(USER);
         bytes32 digest = merkleAirdrop.getMessageHash(USER, AMOUNT_TO_AIRDROP);
 
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(userPrivKey, digest); // signing doest need to prank USER to call it
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(userPrivKey, digest); // signing doesn't need to prank USER to call it
 
         vm.prank(GAS_PAYER);
         merkleAirdrop.claim(USER, AMOUNT_TO_AIRDROP, proof, v, r, s);
